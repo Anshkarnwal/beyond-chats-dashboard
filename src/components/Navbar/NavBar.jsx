@@ -1,6 +1,6 @@
 // import ClickAwayListener from "@mui/material/ClickAwayListener";
 import makeStyles from "@mui/styles/makeStyles";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { withRouter, useHistory, matchPath } from "react-router-dom";
 // import "../../assets/css/User/Navbar/dashboardNavBar.css";
 import styles from "./NavBar.module.css";
@@ -31,6 +31,8 @@ import { useUserContext } from "context/UserContext";
 import { useOrgContext } from "context/OrgContext";
 import MetaHelmet from "components/common/MetaHelmet";
 import { useResponsiveContext } from "context/ResponsiveContext";
+import chatbot from "assets/images/icons/chatbot.png";
+import ellipsis from "assets/images/icons/ellipsis.png";
 
 const useStyles2 = makeStyles((theme) => ({
 	backdrop: {
@@ -116,7 +118,7 @@ const NavBar = (props) => {
 	const [anchorElUser, setAnchorElUser] = React.useState(null);
 	const [anchorElOrg, setAnchorElOrg] = React.useState(null);
 	const { isMobile } = useResponsiveContext();
-
+const [isOpened, setIsOpened] = useState(false);
 	const {
 		user: { access_token, email, name, is_god },
 		setUser,
@@ -165,7 +167,7 @@ const NavBar = (props) => {
 	const activeOption = props.navOptions.find(
 		(option) => option.isActive === true
 	);
-
+	
 	return (
 		<>
 			<MetaHelmet
@@ -189,7 +191,9 @@ const NavBar = (props) => {
 							</IconButton>
 						</Box>
 					) : null}
-					<Box>
+					<Box className={styles.navHdr}>
+					
+						<img src={chatbot} className={styles.imgHdr} />
 						<Typography
 							variant="h3"
 							noWrap
@@ -198,6 +202,7 @@ const NavBar = (props) => {
 								display: "flex",
 								alignItems: "center",
 								gap: 1,
+								
 							}}
 						>
 							{activeOption?.tourHeading ?? "BeyondChats"}
@@ -229,7 +234,9 @@ const NavBar = (props) => {
 							{activeOption?.explanation}
 						</Typography>
 					</Box>
-
+					<Box className={styles.elpsDiv}>
+						<img alt={"ellipsis"} src={ellipsis} onClick={props.toggleRightNav} />
+					</Box>
 					<Box sx={{ flexGrow: 0, gap: 2, display: "flex" }}>
 						{access_token ? (
 							<>
@@ -256,31 +263,7 @@ const NavBar = (props) => {
 									</Button>
 								) : null}
 								{/* ORG Selector */}
-								<Tooltip title="View Orgs">
-									<Button
-										variant="text"
-										disableFocusRipple
-										disableTouchRipple
-										classes={{
-											root: classes.orgBtn,
-										}}
-										endIcon={<KeyboardArrowDown />}
-										onClick={handleOpenOrgMenu}
-									>
-										<Typography
-											variant="h5"
-											component="div"
-											className={classes.orgName}
-										>
-											{currOrgName ?? "Select Org"}
-										</Typography>
-										{/* <KeyboardArrowDown
-											classes={{
-												root: classes.arrowDown,
-											}}
-										/> */}
-									</Button>
-								</Tooltip>
+								
 								{!isMobile ? (
 									<>
 										<Menu

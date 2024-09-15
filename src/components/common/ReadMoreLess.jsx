@@ -4,8 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
-const ReadMoreLess = ({ children, height = 100 }) => {
-	const [isExpanded, setIsExpanded] = useState(false);
+const ReadMoreLess = ({ children, height = 100,isExpanded = false }) => {
 	const [isOverflowing, setIsOverflowing] = useState(true);
 	const contentRef = useRef(null);
 
@@ -16,7 +15,6 @@ const ReadMoreLess = ({ children, height = 100 }) => {
 	}, [height, children]);
 
 	const handleToggle = () => {
-		setIsExpanded(!isExpanded);
 	};
 
 	return (
@@ -35,14 +33,7 @@ const ReadMoreLess = ({ children, height = 100 }) => {
 						>
 							{children}
 						</Box>
-					</Collapse>
-					<Button
-						variant="text"
-						onClick={handleToggle}
-						endIcon={isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-					>
-						{isExpanded ? "Show less" : "Show more"}
-					</Button>
+					</Collapse>					
 				</Box>
 			) : (
 				<Box component="div">{children}</Box>

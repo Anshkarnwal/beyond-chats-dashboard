@@ -1,0 +1,22 @@
+.custom-text-field {
+    border-radius: 5px;
+  }  
+  .custom-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    
+  }
+  .srchCntr{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .txtResult{
+    margin-top: 0.7rem;
+    
+}
+  

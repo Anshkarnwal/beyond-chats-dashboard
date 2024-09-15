@@ -1,9 +1,10 @@
 import { withErrorBoundary } from "components/ErrorBoundary/ErrorBoundary.jsx";
 import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
-import AddIcon from "@mui/icons-material/Add";
+
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toast } from "react-toastify";
 import HistoryIcon from "@mui/icons-material/History";
@@ -14,13 +15,12 @@ import PaginationItem from "@mui/material/PaginationItem";
 import makeStyles from "@mui/styles/makeStyles";
 import MenuItem from "@mui/material/MenuItem";
 import Pagination from "@mui/material/Pagination";
-import { Chip, Stack } from "@mui/material";
+import { Chip, InputAdornment, Stack } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Swal from "sweetalert2/dist/sweetalert2";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import { useOrgContext } from "context/OrgContext";
 import { useApiCall } from "components/common/appHooks.js";
 import { usePlanContext } from "context/PlanContext";
@@ -34,6 +34,7 @@ import { DialogLoader, SmallLoader } from "components/common/NewLoader";
 import { fromUnixTime } from "date-fns";
 import ReadMoreLess from "components/common/ReadMoreLess";
 import mindMapData from "staticData/mindmap.json"
+import styles from "./MindMap.module.css"
 const VectorData = lazy(() => import("./VectorData"));
 const CustomNoRowsOverlay = lazy(
 	() => import("components/common/CustomNoRowsOverlay")
@@ -174,9 +175,7 @@ const MindMap = () => {
 		fetchData();
 	}
 
-	async function handleOpenGroundTruthDialog() {
-		setOpenGroundTruthDialog(true);
-	}
+	
 	async function handleOpenBucketsDialog() {
 		setOpenBucketsDialog(true);
 	}
@@ -334,7 +333,7 @@ const MindMap = () => {
 				headerName: "Actions",
 				align: "center",
 				headerAlign: "center",
-				filterable: false,
+				filterable: false,	
 				renderCell: (params) => (
 					<>
 						<IconButton
@@ -390,12 +389,6 @@ const MindMap = () => {
 		}
 	}
 
-	const handleOpenAddDialog = async () => {
-		if (plan.training !== PLAN_UNLIMITED && total >= plan.training && !is_god) {
-			return toast.info(PLANS_LIMIT_REACHED);
-		}
-		setOpenAddDialog(true);
-	};
 	const handleOpenTasksDialog = async () => {
 		setOpenTasksDialog(true);
 	};
@@ -411,89 +404,51 @@ const MindMap = () => {
 	return (
 		<>
 			<div className={classes.titleContainer}>
-				<Box className={classes.action_box}>
-					<Button
-						variant="contained"
-						color="primary"
-						startIcon={<AddIcon />}
-						onClick={handleOpenAddDialog}
-					>
-						<Typography variant="h6" component="span" align="center">
-							Add Data
-						</Typography>
-					</Button>
-					<Button
-						variant="contained"
-						color="secondary"
-						startIcon={<HistoryIcon />}
-						onClick={handleOpenTasksDialog}
-					>
-						<Typography variant="h6" component="span" align="center">
-							Data Training Status
-						</Typography>
-					</Button>
-					<Button
-						variant="outlined"
-						color="secondary"
-						startIcon={<QuestionAnswerIcon />}
-						onClick={handleOpenGroundTruthDialog}
-					>
-						<Typography variant="h6" component="span" align="center">
-							Ground Truths
-						</Typography>
-					</Button>
-					{is_god ? (
-						<Button
-							variant="outlined"
-							startIcon={<InboxIcon />}
-							onClick={handleOpenBucketsDialog}
-						>
-							<Typography variant="h6" component="span" align="center">
-								Buckets
-							</Typography>
-						</Button>
-					) : null}
-				</Box>
-				<hr
-					style={{
-						width: "80%",
-						margin: "10px 0",
-						border: "0.01rem solid grey",
-					}}
-				/>
-				<form
+				
+					<form
 					onSubmit={handleSubmit(searchVectors)}
 					className={classes.search_container}
 				>
-					<TextField
-						label="Search"
-						variant="outlined"
-						error={errors?.q?.type}
-						helperText={errors?.q?.message}
-						sx={{ mt: 1 }}
-						size="small"
-						{...register("q", {
-							required: "Required",
-						})}
-					/>
-					<TextField
-						select
-						label="Results"
-            defaultValue={3}
-            sx={{ m: 1, minWidth: 120 }}
-            size="small"
-						{...register("numResults")}
-					>
-						{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50].map((value) => (
-							<MenuItem key={value} value={value}>
-								{value}
-							</MenuItem>
-						))}
-					</TextField>
+					<Box className={styles.srchCntr} sx={{gap: 1, p: 1 }}>
+						<TextField
+							label="Search"
+							variant="outlined"
+							error={errors?.q?.type}
+							helperText={errors?.q?.message}
+							size="small"
+							InputProps={{
+								sx: { borderRadius: '10px', width:"350px" }, // Rounded corners for the search input
+								startAdornment: (
+									<InputAdornment position="start">
+										<SearchIcon />
+									</InputAdornment>
+								),
+							}}
+							{...register('q', {
+								required: 'Required',
+							})}
+						/>
+						<TextField
+						className={styles.txtResult}
+							select
+							label="Results"
+							defaultValue={3}
+							size="small"
+							InputProps={{
+								sx: { borderRadius: '10px', display:"inline", width:"100px" }, // Rounded corners for the dropdown
+							}}
+							{...register('numResults')}
+						>
+							{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50].map((value) => (
+								<MenuItem key={value} value={value}>
+									{value}
+								</MenuItem>
+							))}
+						</TextField>
+					</Box>
 
-					<Button type="submit" variant="contained" sx={{ m: 1 }}>
-						Search
-					</Button>
+					{/* 
+					</Button> */}
 					{hasSearched ? (
 						<Button
 							color="secondary"
@@ -595,16 +550,7 @@ const MindMap = () => {
 					/>
 				) : null}
 			</Suspense>
-			<Suspense fallback={<DialogLoader />}>
-				{openGroundTruthDialog ? (
-					<GroundTruthDialog
-						{...{
-							openGroundTruthDialog,
-							setOpenGroundTruthDialog,
-						}}
-					/>
-				) : null}
-			</Suspense>
+			
 			<Suspense fallback={<DialogLoader />}>
 				{openBucketsDialog ? (
 					<BucketsDialog

@@ -40,6 +40,7 @@ import { useApiCall } from "./common/appHooks.js";
 import notificationPermission from "./common/notificationPermission";
 import { getMessaging, onMessage } from "firebase/messaging";
 import firebase from "./common/firebase";
+import RightDrawer from "./RightDrawer/RightDrawer";
 
 const ReactJoyride = lazy(() => import("react-joyride"));
 const MindMap = lazy(() => import("./MindMap/MindMap.jsx"));
@@ -83,6 +84,7 @@ function AppRoutes() {
 		return searchParams.get("guide") === "true";
 	});
 	const [isOpened, setIsOpened] = useState(false);
+	const [isRightDrawerOpened, setIsRightDrawerOpened] = useState(false);
 	const [isBackdropOpen, setIsBackdropOpen] = useState(false);
 	const { org } = useOrgContext();
 	const { isMobile } = useResponsiveContext();
@@ -227,6 +229,10 @@ function AppRoutes() {
 	const toggleLeftNav = (set) => {
 		setIsOpened((prev) => (typeof set === "boolean" ? set : !prev));
 	};
+	const toggleRightNav = (set) => {
+		setIsRightDrawerOpened((prev) => (typeof set === "boolean" ? set : !prev));
+	};
+	
 
 	useEffect(() => {
 		if (access_token) {
@@ -292,6 +298,7 @@ function AppRoutes() {
 						navOptions={navOptions}
 						setShowStartTutorial={setShowStartTutorial}
 						toggleLeftNav={toggleLeftNav}
+						toggleRightNav={toggleRightNav}
 					/>
 					<Suspense fallback={<NewLoader firstPage={true} name="routes" />}>
 						<Switch>
@@ -304,6 +311,7 @@ function AppRoutes() {
 							<Route exact path="/forgot-password" component={ForgotPassword} />
 							{access_token && (
 								<>
+									<RightDrawer {...{ isRightDrawerOpened, toggleRightNav }} />
 									<LeftDrawer {...{ isOpened, toggleLeftNav, navOptions }} />
 									<Suspense fallback={<></>}>
 										{showStartTutorial ? (

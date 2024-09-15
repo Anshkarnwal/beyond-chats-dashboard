@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import ReadMoreLess from "components/common/ReadMoreLess";
 import { Box, IconButton, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -21,8 +21,9 @@ const useStyles = makeStyles((theme) => ({
 	source_type_container: {
 		display: "flex",
 		width: "100%",
-		justifyContent: "flex-start",
+		justifyContent: "space-between",
 		alignItems: "center",
+		marginBottom: "0.7rem",
 	},
 	source_type: {
 		fontSize: "0.6rem",
@@ -42,13 +43,14 @@ const useStyles = makeStyles((theme) => ({
 	},
 	details_container: {
 		display: "flex",
-		flexDirection: "column",
-		justifyContent: "flex-start",
+		flexDirection: "row",
+		justifyContent: "space-between",
 		alignItems: "flex-start",
 		gap: "0.25rem",
+		width:'99%'
 	},
 	source_link: {
-		color: "var(--color5)",
+		color: "#2872fa",
 		textDecoration: "underline",
 	},
 	actions_container: {
@@ -61,9 +63,9 @@ const useStyles = makeStyles((theme) => ({
 
 const VectorData = ({ data, handleOpenEditDialog, handleDelete }) => {
 	const classes = useStyles();
+	const [isExpanded, setIsExpanded] = useState(false);
 	return (
 		<Box className={classes.root}>
-			<ReadMoreLess height={50}>{data?.metadata?.text}</ReadMoreLess>
 			<Box className={classes.source_type_container}>
 				<Typography
 					variant="caption"
@@ -72,7 +74,33 @@ const VectorData = ({ data, handleOpenEditDialog, handleDelete }) => {
 				>
 					{data?.metadata?.source_type ?? "Unknown Source"}
 				</Typography>
+				<Box className={classes.actions_container}>
+					<IconButton size="medium" onClick={() => setIsExpanded(!isExpanded)}>
+						{ isExpanded ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+					</IconButton>
+					<IconButton size="medium" onClick={() => handleOpenEditDialog(data)}>
+						<Edit color="primary" fontSize="small" />
+					</IconButton>
+					<IconButton
+						size="medium"
+						onClick={() => handleDelete(data?.vector_id)}
+					>
+						<Delete color="error" fontSize="small" />
+					</IconButton>
+				</Box>
 			</Box>
+			{/* <ReadMoreLess isExpanded={isExpanded} height={50}>{data?.metadata?.text}</ReadMoreLess> */}
+			<Typography
+				sx={{
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					display: '-webkit-box',
+					WebkitLineClamp: isExpanded?"0":"2",
+					WebkitBoxOrient: 'vertical',
+				}}
+			>
+				{data?.metadata?.text}
+			</Typography>
 
 			<Box className={classes.footer_container}>
 				<Box className={classes.details_container}>
@@ -91,19 +119,7 @@ const VectorData = ({ data, handleOpenEditDialog, handleDelete }) => {
 							numeric: "auto",
 						}).format(-new Date(data?.metadata?.created_at), "days")}
 					</Typography>
-				</Box>
-
-				<Box className={classes.actions_container}>
-					<IconButton size="medium" onClick={() => handleOpenEditDialog(data)}>
-						<Edit color="primary" fontSize="small" />
-					</IconButton>
-					<IconButton
-						size="medium"
-						onClick={() => handleDelete(data?.vector_id)}
-					>
-						<Delete color="error" fontSize="small" />
-					</IconButton>
-				</Box>
+				</Box>				
 			</Box>
 		</Box>
 	);
