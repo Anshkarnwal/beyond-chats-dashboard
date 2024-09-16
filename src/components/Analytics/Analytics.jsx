@@ -6,7 +6,7 @@ import { REQUEST_CANCELED_MESSAGE } from "components/common/constants";
 import { withErrorBoundary } from "components/ErrorBoundary/ErrorBoundary";
 import { useOrgContext } from "context/OrgContext";
 import dayjs from "dayjs";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const Analytics = () => {
@@ -30,80 +30,57 @@ const Analytics = () => {
 	);
 	const [loading, setLoading] = useState(true);
 	const [timeRange, setTimeRange] = useState("1 month");
-	// const filteredData = useMemo(() => {
-	// 	const today = dayjs();
-	// 	let startDate;
-
-	// 	switch (timeRange) {
-	// 		case "1 week":
-	// 			startDate = today.subtract(1, "week");
-	// 			break;
-	// 		case "1 month":
-	// 			startDate = today.subtract(1, "month");
-	// 			break;
-	// 		case "3 months":
-	// 			startDate = today.subtract(3, "month");
-	// 			break;
-	// 		case "6 months":
-	// 			startDate = today.subtract(6, "month");
-	// 			break;
-	// 		case "all time":
-	// 		default:
-	// 			return data;
-	// 	}
-
-	// 	return data.filter((item) => dayjs(item.week_start).isAfter(startDate));
-	// }, [data, timeRange]);
-
+	
 	const handleChange = (event) => {
 		setTimeRange(event.target.value);
 	};
 
-	async function getAnalytics() {
-		try {
-			const today = dayjs();
-			let startDate;
-
-			switch (timeRange) {
-				case "1 week":
-					startDate = today.subtract(1, "week");
-					break;
-				case "1 month":
-					startDate = today.subtract(1, "month");
-					break;
-				case "3 months":
-					startDate = today.subtract(3, "month");
-					break;
-				case "6 months":
-					startDate = today.subtract(6, "month");
-					break;
-				case "all time":
-				default:
-					break;
+		async function getAnalytics() {
+			try {
+				const today = dayjs();
+				let startDate;
+	
+				switch (timeRange) {
+					case "1 week":
+						startDate = today.subtract(1, "week");
+						break;
+					case "1 month":
+						startDate = today.subtract(1, "month");
+						break;
+					case "3 months":
+						startDate = today.subtract(3, "month");
+						break;
+					case "6 months":
+						startDate = today.subtract(6, "month");
+						break;
+					case "all time":
+					default:
+						break;
+				}
+				setLoading(true);
+				const response = await Get(
+					1,
+					"analytics",
+					{
+						start_date: startDate ? startDate.toISOString() : undefined,
+						end_date: today.toISOString(),
+					},
+					axiosCancelSource.token
+				);
+				setData(response.data.data);
+				setLoading(false);
+			} catch (error) {
+				console.error(error);
+				setLoading(false);
+				setData([]);
+				toast.error(error.message);
 			}
-			setLoading(true);
-			const response = await Get(
-				1,
-				"analytics",
-				{
-					start_date: startDate ? startDate.toISOString() : undefined,
-					end_date: today.toISOString(),
-				},
-				axiosCancelSource.token
-			);
-			setData(response.data.data);
-			setLoading(false);
-		} catch (error) {
-			console.error(error);
-			setLoading(false);
-			setData([]);
-			toast.error(error.message);
 		}
-	}
 
 	useEffect(() => {
 		getAnalytics();
 		return () => axiosCancelSource.cancel(REQUEST_CANCELED_MESSAGE);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [org.id, timeRange]);
 
 	return (

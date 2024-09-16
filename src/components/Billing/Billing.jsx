@@ -10,8 +10,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useOrgContext } from "context/OrgContext";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {
-	CREDIT_CATEGORY_PROMOTIONAL,
+import {	
 	PLAN_UNLIMITED,
 } from "components/common/constants";
 import Box from "@mui/material/Box";
@@ -24,7 +23,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import { Button } from "@mui/material";
-import Swal from "sweetalert2/dist/sweetalert2";
 import { intlFormatDistance } from "date-fns";
 
 const EditSubscriptionDialog = lazy(() => import("./EditSubscriptionDialog"));
@@ -32,7 +30,7 @@ const EditSubscriptionDialog = lazy(() => import("./EditSubscriptionDialog"));
 const Billing = () => {
 	const axiosCancelSource = axios.CancelToken.source();
 	const { org } = useOrgContext();
-	const { Get, Post } = useApiCall();
+	const { Get } = useApiCall();
 	// creating random data from loading
 	const [subscription, setSubscription] = useState({});
 	const [creditsHistory, setCreditsHistory] = useState([]);
@@ -90,24 +88,6 @@ const Billing = () => {
 		}
 	}
 
-	// async function handleRecordPayment() {
-	// 	const { value: amount } = await Swal.fire({
-	// 		title: "Enter Payment Amount",
-	// 		input: "number",
-	// 		inputValue: pendingPayment.total,
-	// 		showCancelButton: true,
-	// 		inputValidator: (value) => {
-	// 			if (!value) {
-	// 				return "You need to write an amount!";
-	// 			}
-	// 		},
-	//   });
-
-	// }
-
-	// async function handlePayment(params) {
-	// 	return Post(1, "update_pending_payments", params);
-	// }
 
 	async function toggleUpdateSubscription(set, update = false) {
 		if (update === true) {
@@ -118,32 +98,7 @@ const Billing = () => {
 		);
 	}
 
-	async function addCredits() {
-		const { value: amount } = await Swal.fire({
-			title: "Enter Amount",
-			input: "number",
-			inputLabel: "How many credits do you want to add?",
-			showCancelButton: true,
-			inputValidator: (value) => {
-				if (!value) {
-					return "You need to write something!";
-				}
-			},
-		});
-		if (amount) {
-			try {
-				const response = await Post(1, "credits/update", {
-					amount,
-					credit_category_id: CREDIT_CATEGORY_PROMOTIONAL,
-				});
-				setCredits(response.data.data);
-				getCreditsHistory();
-			} catch (error) {
-				console.error(error);
-				toast.error(error.message);
-			}
-		}
-	}
+
 	async function getDetails() {
 		getSubscription();
 		getCredits();
@@ -151,6 +106,7 @@ const Billing = () => {
 	}
 	useEffect(() => {
 		getDetails();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [org.id]);
 
 	const {

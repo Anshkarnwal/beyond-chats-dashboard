@@ -7,7 +7,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toast } from "react-toastify";
-import HistoryIcon from "@mui/icons-material/History";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -23,13 +22,6 @@ import { Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useOrgContext } from "context/OrgContext";
 import { useApiCall } from "components/common/appHooks.js";
-import { usePlanContext } from "context/PlanContext";
-import InboxIcon from "@mui/icons-material/Inbox";
-import {
-	PLANS_LIMIT_REACHED,
-	PLAN_UNLIMITED,
-} from "components/common/constants";
-import { useUserContext } from "context/UserContext";
 import { DialogLoader, SmallLoader } from "components/common/NewLoader";
 import { fromUnixTime } from "date-fns";
 import ReadMoreLess from "components/common/ReadMoreLess";
@@ -39,7 +31,6 @@ const VectorData = lazy(() => import("./VectorData"));
 const CustomNoRowsOverlay = lazy(
 	() => import("components/common/CustomNoRowsOverlay")
 );
-const GroundTruthDialog = lazy(() => import("./GroundTruth/GroundTruthDialog"));
 const BucketsDialog = lazy(() => import("./Buckets/BucketsDialog"));
 const ViewTrainingStatusDialog = lazy(
 	() => import("./ViewTrainingStatusDialog")
@@ -104,19 +95,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MindMap = () => {
-	const { Post, Get } = useApiCall();
-	const classes = useStyles();
-	const {
-		user: { is_god },
-	} = useUserContext();
+	const { Post } = useApiCall();
+	const classes = useStyles();	
 	const { org } = useOrgContext();
-	const { plan } = usePlanContext();
 	const theme = useTheme();
 	const isSmScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
 	const [data, setData] = useState([]);
 
-	const [openGroundTruthDialog, setOpenGroundTruthDialog] = useState(false);
 	const [openBucketsDialog, setOpenBucketsDialog] = useState(false);
 
 	const location = useLocation();
@@ -127,7 +113,6 @@ const MindMap = () => {
 	const order = Number(query.get("order")) || undefined;
 
 	const [count, setCount] = useState(0);
-	const [total, setTotal] = useState(0);
 	const [loading, setLoading] = useState(true);
 	const [hasSearched, setHasSearched] = useState(false);
 	const {
@@ -160,7 +145,6 @@ const MindMap = () => {
 			// 	order: order || undefined,
 			// });
 			setData(mindMapData[page].data.data);
-			setTotal(mindMapData[page].data.total);
 			setCount(mindMapData[page].data.last_page);
 			setLoading(false);
 		} catch (error) {
@@ -175,10 +159,6 @@ const MindMap = () => {
 		fetchData();
 	}
 
-	
-	async function handleOpenBucketsDialog() {
-		setOpenBucketsDialog(true);
-	}
 	async function searchVectors({ q, numResults }) {
 		try {
 			setLoading(true);
@@ -352,6 +332,7 @@ const MindMap = () => {
 				),
 			},
 		],
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[hasSearched]
 	);
 
@@ -389,15 +370,14 @@ const MindMap = () => {
 		}
 	}
 
-	const handleOpenTasksDialog = async () => {
-		setOpenTasksDialog(true);
-	};
+	
 
 	useEffect(() => {
 		setData([]);
 		// setCount(0);
 		fetchData();
 		// return addBeyondChat();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [org.host_url, page, order, sortBy]);
 	const getRowId = (row) => row.vector_id; // Assuming vector_id is the unique identifier for each row
 
